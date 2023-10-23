@@ -1,0 +1,311 @@
+
+#define A 11
+#define B 12
+#define C 6
+#define D 7
+#define E 8
+#define F 10
+#define G 9
+#define NaturalOPrimo 2
+#define UNIDAD A4 
+#define DECENA A5
+#define SENSOR A1
+#define MOTOR A2
+#define DECREMENTAR 5
+#define RESETEAR 4
+#define INCREMENTAR 3
+// Definición de las variables y funciones
+int lectura;
+int valorTemperatura;
+int contador = 0;
+
+// Define las funciones de incrementar, decrementar y resetear
+const int incrementar(int valorActual) {
+  return valorActual + 1;
+}
+const int decrementar(int valorActual) {
+  return valorActual - 1;
+}
+const int reiniciar(int valorActual) {
+  return 0;
+}
+
+// Función para verificar si un número es primo
+bool esPrimo(int numero) {
+  if (numero == 0 || numero == 1) return false;
+  for (int i = 2; i <= numero / 2; i++) {
+    if (numero % i == 0) {
+      return false;
+    }
+  }
+  return true;
+}
+
+// Función para obtener el siguiente número primo
+int siguientePrimo() {
+  contador++;
+  while (!esPrimo(contador)) {
+    contador++;
+  }
+  return contador;
+}
+
+// Variables para controlar los segmentos del display
+bool unidad = LOW;
+bool decena = LOW;
+
+// Función para controlar el contador
+void controlarContador() {
+  if (contador >= 100) {
+    contador = 0;
+  } else if (contador < 0) {
+    contador = 99;
+  }
+}
+
+// Enciende los segmentos dependiendo el valor que llegue del 0 al 9
+void encenderLed(int contador){
+  switch(contador)
+  {
+   case 0:
+  {
+    digitalWrite(A,HIGH);
+    digitalWrite(B,HIGH);
+    digitalWrite(C,HIGH);
+    digitalWrite(D,HIGH);
+    digitalWrite(E,HIGH);
+    digitalWrite(F,HIGH);
+  }
+    break;
+  
+    case 1:
+  {
+    digitalWrite(B,HIGH);
+    digitalWrite(C,HIGH);
+  }
+  	break;
+ 
+    case 2:
+  {
+    digitalWrite(A,HIGH);
+    digitalWrite(B,HIGH);
+    digitalWrite(G,HIGH);
+    digitalWrite(E,HIGH);
+    digitalWrite(D,HIGH);
+  }
+  	break;
+  
+    case 3:
+  {
+    digitalWrite(A,HIGH);
+    digitalWrite(B,HIGH);
+    digitalWrite(G,HIGH);
+    digitalWrite(C,HIGH);
+    digitalWrite(D,HIGH);
+  }
+  	break;
+  
+    case 4:
+  {
+    digitalWrite(B,HIGH);
+    digitalWrite(G,HIGH);
+    digitalWrite(C,HIGH);
+    digitalWrite(F,HIGH);
+  }
+  	break;
+  
+    case 5:
+  {
+    digitalWrite(A,HIGH);
+    digitalWrite(F,HIGH);
+    digitalWrite(G,HIGH);
+    digitalWrite(C,HIGH);
+    digitalWrite(D,HIGH);
+  }
+  	break;
+  
+    case 6:
+  {
+    digitalWrite(A,HIGH);
+    digitalWrite(F,HIGH);
+    digitalWrite(G,HIGH);
+    digitalWrite(C,HIGH);
+    digitalWrite(E,HIGH);
+    digitalWrite(D,HIGH);
+  }
+  	break;
+  
+    case 7:
+  {
+    digitalWrite(A,HIGH);
+    digitalWrite(B,HIGH);
+    digitalWrite(C,HIGH);
+  }
+  	break;
+  
+    case 8:
+  {
+    digitalWrite(A,HIGH);
+    digitalWrite(B,HIGH);
+    digitalWrite(C,HIGH);
+    digitalWrite(D,HIGH);
+    digitalWrite(E,HIGH);
+    digitalWrite(F,HIGH);
+    digitalWrite(G,HIGH);
+  }
+  	break;
+  
+    case 9:
+  {
+    digitalWrite(A,HIGH);
+    digitalWrite(B,HIGH);
+    digitalWrite(C,HIGH);
+    digitalWrite(F,HIGH);
+    digitalWrite(G,HIGH);
+  }
+  	break;
+  }
+}
+
+// Configuración inicial del Arduino
+void setup() {
+  pinMode(A, OUTPUT);
+  pinMode(B, OUTPUT);
+  pinMode(C, OUTPUT);
+  pinMode(D, OUTPUT);
+  pinMode(E, OUTPUT);
+  pinMode(F, OUTPUT);
+  pinMode(G, OUTPUT);
+  
+  // Configuración de los pines de entrada y salida
+  pinMode(NaturalOPrimo, INPUT_PULLUP);
+  pinMode(DECENA, OUTPUT);
+  pinMode(UNIDAD, OUTPUT);
+  
+  // Configuración del motor 
+  pinMode(MOTOR, OUTPUT);
+  
+  // Configuración de los pines de los pulsadores
+  pinMode(DECREMENTAR, INPUT_PULLUP);
+  pinMode(RESETEAR, INPUT_PULLUP);
+  pinMode(INCREMENTAR, INPUT_PULLUP);
+  
+  // Inicio de la comunicación serial
+  Serial.begin(9600);
+}
+
+// Función para controlar el segundo segmento del display
+void segundoSegmento(int unidadesValor) {
+    digitalWrite(A, LOW);
+    digitalWrite(B, LOW);
+    digitalWrite(C, LOW);
+    digitalWrite(D, LOW);
+    digitalWrite(E, LOW);
+    digitalWrite(F, LOW);
+    digitalWrite(G, LOW);
+
+    if (unidadesValor >= 0 && unidadesValor <= 9) {
+        unidad = HIGH; 
+    } else {
+        unidad = LOW; 
+    }
+
+    if (unidad == HIGH) {
+        encenderLed(unidadesValor); 
+    }
+}
+
+// Función para controlar el primer segmento del display
+void primerSegmento(int decenasValor) {
+    digitalWrite(A, LOW);
+    digitalWrite(B, LOW);
+    digitalWrite(C, LOW);
+    digitalWrite(D, LOW);
+    digitalWrite(E, LOW);
+    digitalWrite(F, LOW);
+    digitalWrite(G, LOW);
+
+    if (decenasValor >= 1 && decenasValor <= 9) {
+        decena = HIGH; 
+    } else {
+        decena = LOW; 
+    }
+
+    if (decena == HIGH) {
+        encenderLed(decenasValor); 
+    }
+}
+
+// Bucle principal del programa
+void loop() {
+  
+   // Bucle infinito
+   while (true) {
+
+     // Cálculo de las unidades y decenas del contador
+     int decenasValor = contador % 10;
+     int unidadesValor = (contador / 10) % 10;
+
+     // Control del contador
+     controlarContador();
+
+     // Si el pin NaturalOPrimo está en HIGH...
+     if (digitalRead(NaturalOPrimo) == HIGH) {
+
+       // Incrementa el contador
+     if (digitalRead(INCREMENTAR) == LOW) {
+       contador = incrementar(contador);
+     } else if (digitalRead(DECREMENTAR) == LOW) { 
+       contador = decrementar(contador);
+     } else if (digitalRead(RESETEAR)== LOW){
+       contador = reiniciar(contador);
+     }
+     } else {
+
+       // Si no, obtén el siguiente número primo
+       contador = siguientePrimo();
+     }
+
+     // Envía el valor del contador por el puerto serial
+     Serial.print("Contador: ");
+     Serial.println(contador);
+
+     // Enciende el segmento de las unidades y apaga el de las decenas
+     digitalWrite(UNIDAD, HIGH); 
+     digitalWrite(DECENA, LOW); 
+
+     // Controla el segundo segmento del display con el valor de las unidades
+     segundoSegmento(unidadesValor);
+
+     // Retardo de tiempo
+     delay(400);
+
+     // Apaga el segmento de las unidades y enciende el de las decenas
+     digitalWrite(UNIDAD, LOW); 
+     digitalWrite(DECENA, HIGH); 
+
+     // Controla el primer segmento del display con el valor de las decenas
+     primerSegmento(decenasValor);
+
+     // Retardo de tiempo
+     delay(400); 
+	
+     // Lectura del sensor de temperatura
+     lectura = analogRead(SENSOR); 
+
+     // Mapeo del valor leído a la escala de temperatura
+     valorTemperatura = map(lectura,20,358,-40,125);
+
+     // Si la temperatura está en un rango determinado...
+     if (valorTemperatura >= 0 && valorTemperatura < 35) { 
+
+       // Enciende el motor
+       digitalWrite(MOTOR, HIGH); 
+
+     } else {
+
+       // Si no, apaga el motor
+       digitalWrite(MOTOR, LOW); 
+     } 
+   }
+}

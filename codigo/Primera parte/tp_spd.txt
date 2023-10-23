@@ -1,0 +1,259 @@
+#define B 13
+#define A 12
+#define F 11
+#define G 10
+#define E 9
+#define D 8
+#define C 7
+#define UNIDAD A5
+#define DECENA A4
+#define DECREMENTAR 4
+#define RESETEAR 3
+#define INCREMENTAR 2
+
+// Definición de las variables y funciones
+int contador = 0;
+
+// Define las funciones de incrementar, decrementar y resetear
+const int incrementar(int valorActual) {
+  return valorActual + 1;
+}
+const int decrementar(int valorActual) {
+  return valorActual - 1;
+}
+const int reiniciar(int valorActual) {
+  return 0;
+}
+
+// Variables para controlar los segmentos del display
+bool unidad = LOW;
+bool decena = LOW;
+
+// Función para controlar el contador
+void controlarContador() {
+  if (contador >= 100) {
+    contador = 0;
+  } else if (contador < 0) {
+    contador = 99;
+  }
+}
+
+// Enciende los segmentos dependiendo el valor que llegue del 0 al 9
+void encenderLed(int contador){
+  switch(contador)
+  {
+   case 0:
+  {
+    digitalWrite(A,HIGH);
+    digitalWrite(B,HIGH);
+    digitalWrite(C,HIGH);
+    digitalWrite(D,HIGH);
+    digitalWrite(E,HIGH);
+    digitalWrite(F,HIGH);
+  }
+    break;
+  
+    case 1:
+  {
+    digitalWrite(B,HIGH);
+    digitalWrite(C,HIGH);
+  }
+  	break;
+ 
+    case 2:
+  {
+    digitalWrite(A,HIGH);
+    digitalWrite(B,HIGH);
+    digitalWrite(G,HIGH);
+    digitalWrite(E,HIGH);
+    digitalWrite(D,HIGH);
+  }
+  	break;
+  
+    case 3:
+  {
+    digitalWrite(A,HIGH);
+    digitalWrite(B,HIGH);
+    digitalWrite(G,HIGH);
+    digitalWrite(C,HIGH);
+    digitalWrite(D,HIGH);
+  }
+  	break;
+  
+    case 4:
+  {
+    digitalWrite(B,HIGH);
+    digitalWrite(G,HIGH);
+    digitalWrite(C,HIGH);
+    digitalWrite(F,HIGH);
+  }
+  	break;
+  
+    case 5:
+  {
+    digitalWrite(A,HIGH);
+    digitalWrite(F,HIGH);
+    digitalWrite(G,HIGH);
+    digitalWrite(C,HIGH);
+    digitalWrite(D,HIGH);
+  }
+  	break;
+  
+    case 6:
+  {
+    digitalWrite(A,HIGH);
+    digitalWrite(F,HIGH);
+    digitalWrite(G,HIGH);
+    digitalWrite(C,HIGH);
+    digitalWrite(E,HIGH);
+    digitalWrite(D,HIGH);
+  }
+  	break;
+  
+    case 7:
+  {
+    digitalWrite(A,HIGH);
+    digitalWrite(B,HIGH);
+    digitalWrite(C,HIGH);
+  }
+  	break;
+  
+    case 8:
+  {
+    digitalWrite(A,HIGH);
+    digitalWrite(B,HIGH);
+    digitalWrite(C,HIGH);
+    digitalWrite(D,HIGH);
+    digitalWrite(E,HIGH);
+    digitalWrite(F,HIGH);
+    digitalWrite(G,HIGH);
+  }
+  	break;
+  
+    case 9:
+  {
+    digitalWrite(A,HIGH);
+    digitalWrite(B,HIGH);
+    digitalWrite(C,HIGH);
+    digitalWrite(F,HIGH);
+    digitalWrite(G,HIGH);
+  }
+  	break;
+  }
+}
+
+// Configuración inicial del Arduino
+void setup() {
+  pinMode(A, OUTPUT);
+  pinMode(B, OUTPUT);
+  pinMode(C, OUTPUT);
+  pinMode(D, OUTPUT);
+  pinMode(E, OUTPUT);
+  pinMode(F, OUTPUT);
+  pinMode(G, OUTPUT);
+  
+  // Configuración de los pines de entrada y salida
+  pinMode(DECENA, OUTPUT);
+  pinMode(UNIDAD, OUTPUT);
+  
+  // Configuración de los pines de los pulsadores
+  pinMode(DECREMENTAR, INPUT_PULLUP);
+  pinMode(RESETEAR, INPUT_PULLUP);
+  pinMode(INCREMENTAR, INPUT_PULLUP);
+  
+  // Inicio de la comunicación serial
+  Serial.begin(9600);
+}
+
+// Función para controlar el segundo segmento del display
+void segundoSegmento(int unidadesValor) {
+    digitalWrite(A, LOW);
+    digitalWrite(B, LOW);
+    digitalWrite(C, LOW);
+    digitalWrite(D, LOW);
+    digitalWrite(E, LOW);
+    digitalWrite(F, LOW);
+    digitalWrite(G, LOW);
+
+    if (unidadesValor >= 0 && unidadesValor <= 9) {
+        unidad = HIGH; 
+    } else {
+        unidad = LOW; 
+    }
+
+    if (unidad == HIGH) {
+        encenderLed(unidadesValor); 
+    }
+}
+
+// Función para controlar el primer segmento del display
+void primerSegmento(int decenasValor) {
+    digitalWrite(A, LOW);
+    digitalWrite(B, LOW);
+    digitalWrite(C, LOW);
+    digitalWrite(D, LOW);
+    digitalWrite(E, LOW);
+    digitalWrite(F, LOW);
+    digitalWrite(G, LOW);
+
+    if (decenasValor >= 1 && decenasValor <= 9) {
+        decena = HIGH; 
+    } else {
+        decena = LOW; 
+    }
+
+    if (decena == HIGH) {
+        encenderLed(decenasValor); 
+    }
+}
+
+// Bucle principal del programa
+void loop() {
+  
+   // Bucle infinito
+   while (true) {
+
+     // Cálculo de las unidades y decenas del contador
+     int decenasValor = contador % 10;
+     int unidadesValor = (contador / 10) % 10;
+
+     // Control del contador
+     controlarContador();
+
+     // Incrementa el contador
+     if (digitalRead(INCREMENTAR) == LOW) {
+       contador = incrementar(contador);
+     } else if (digitalRead(DECREMENTAR) == LOW) { 
+       contador = decrementar(contador);
+     } else if (digitalRead(RESETEAR)== LOW){
+       contador = reiniciar(contador);
+     }
+
+
+     // Envía el valor del contador por el puerto serial
+     Serial.print("Contador: ");
+     Serial.println(contador);
+
+     // Enciende el segmento de las unidades y apaga el de las decenas
+     digitalWrite(UNIDAD, HIGH); 
+     digitalWrite(DECENA, LOW); 
+
+     // Controla el segundo segmento del display con el valor de las unidades
+     segundoSegmento(unidadesValor);
+
+     // Retardo de tiempo
+     delay(400);
+
+     // Apaga el segmento de las unidades y enciende el de las decenas
+     digitalWrite(UNIDAD, LOW); 
+     digitalWrite(DECENA, HIGH); 
+
+     // Controla el primer segmento del display con el valor de las decenas
+     primerSegmento(decenasValor);
+
+     // Retardo de tiempo
+     delay(400); 
+	
+   }
+}
+
