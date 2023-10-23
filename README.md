@@ -32,6 +32,7 @@ Este proyecto fue desarrollado y probado en Tinkercad, una plataforma online par
   - Primera parte : https://www.tinkercad.com/things/2TxeY7cjXlN
   - Segunda parte : https://www.tinkercad.com/things/coJwZleTgPu
   - Tercera parte : https://www.tinkercad.com/things/bBwi0j5DiSz
+  - Cuarta parte : https://www.tinkercad.com/things/a4J6TiSsANa
 
 ## Fuentes
 
